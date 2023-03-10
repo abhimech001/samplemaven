@@ -6,7 +6,7 @@ pipeline {
     }
     parameters {
         string(name: 'Branch', defaultValue: 'dev', description: 'DefaultBranch')
-        booleanParam(name: 'isTest', defaultValue: false, description: 'enable or disable test')
+        booleanParam(name: 'isTest', defaultValue: true, description: 'enable or disable test')
         choice(name: 'ENV', choices: ['DEV', 'TEST', 'PROD'], description: 'Pick ENV. 1st array is default in choice array')
     }
 
@@ -20,7 +20,7 @@ pipeline {
         stage('Test') {
             when {
                 expression {
-                    params.isTest == "true"
+                    params.isTest
                 }
             }
             steps {
