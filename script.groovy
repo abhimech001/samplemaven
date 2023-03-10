@@ -1,4 +1,4 @@
-define buildApp() {
+def buildApp() {
   echo "Welcome to groovy"
 }
 
