@@ -1,3 +1,5 @@
+def gv
+
 pipeline {
     agent any
     tools {
@@ -11,8 +13,18 @@ pipeline {
     }
 
     stages {
+        stage('Init') {
+            steps {
+                script{
+                    gv = load "script.groovy"
+                }
+            }
+        }
         stage('Build') {
             steps {
+                script {
+                    gv.buildApp()
+                }
                 sh "echo ${params.Branch}"
                 sh 'mvn -B -DskipTests clean package'
             }
