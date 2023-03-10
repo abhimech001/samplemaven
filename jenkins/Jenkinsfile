@@ -19,7 +19,7 @@ pipeline {
         }
         stage('Test') {
             when {
-                ${params.isTest}=="true"
+                ${params.isTest} "true"
             }
             steps {
                 sh 'mvn test'
@@ -32,7 +32,7 @@ pipeline {
         }
         stage('Deliver') {
             when {
-                ${params.ENV}=='PROD' 
+                ${params.ENV} "PROD" 
             }
             steps {
                 sh './jenkins/scripts/deliver.sh'
