@@ -4,13 +4,24 @@ pipeline {
         // Install the Maven version configured as "maven3" and add it to the path.
         maven "maven3"
     }
+    parameters {
+        string(name: 'Branch', defaultValue: 'dev', description: 'DefaultBranch')
+        booleanParam(name: 'isTest', defaultValue: true, description: 'enable or disable test')
+        choice(name: 'ENV', choices: ['DEV', 'TEST', 'PROD'], description: 'Pick ENV. 1st array is default in choice array')
+    }
+     ])
+    ])
     stages {
         stage('Build') {
             steps {
+                sh "echo ${params.Branch}"
                 sh 'mvn -B -DskipTests clean package'
             }
         }
         stage('Test') {
+            when {
+                isTest
+            }
             steps {
                 sh 'mvn test'
             }
@@ -21,6 +32,9 @@ pipeline {
             }
         }
         stage('Deliver') {
+            when {
+                ENV 'PROD'
+            }
             steps {
                 sh './jenkins/scripts/deliver.sh'
             }
