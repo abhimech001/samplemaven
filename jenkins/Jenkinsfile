@@ -21,6 +21,8 @@ pipeline {
                 }
             }
         }
+        stage('Parallel Stage') {
+        parallel {
         stage('Build') {
             steps {
                 script {
@@ -46,7 +48,7 @@ pipeline {
                     junit 'target/surefire-reports/*.xml'
                 }
             }
-        }
+        }}}
         stage("Code coverage") {
            steps {
                jacoco(
