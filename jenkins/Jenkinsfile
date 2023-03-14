@@ -7,7 +7,8 @@ pipeline {
         maven "maven3"
     }
     parameters {
-        string(name: 'Branch', defaultValue: 'dev', description: 'DefaultBranch')
+        string(name: 'MAJOR_VERSION', defaultValue: '1', description: 'DefaultBranch')
+        string(name: 'MINOR_VERSION', defaultValue: '0', description: 'DefaultBranch')
         booleanParam(name: 'isTest', defaultValue: true, description: 'enable or disable test')
         choice(name: 'ENV', choices: ['DEV', 'TEST', 'PROD'], description: 'Pick ENV. 1st array is default in choice array')
     }
@@ -25,8 +26,10 @@ pipeline {
                 script {
                     gv.buildApp()
                 }
-                sh "echo ${params.Branch}"
-                sh 'mvn -B -DskipTests clean package'
+                sh """
+                mvn versions:set versions:commit -DnewVersion="${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}"
+                mvn -B -DskipTests clean package
+                """
             }
         }
         stage('Test') {
