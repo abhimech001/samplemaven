@@ -13,8 +13,12 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh "echo ${params.Branch}"
-                sh 'mvn -B -DskipTests clean package'
+                sh """
+                echo ${params.Branch}
+                echo ${BUILD_NUMBER}
+                mvn versions:set versions:commit -DnewVersion="0.0.25"
+                mvn -B -DskipTests clean package
+                """
             }
         }
         stage('Test') {
