@@ -60,12 +60,16 @@ pipeline {
             }
         }
         post {
-        changed {
-            script {
-                    ns.notifyStatusChangeViaEmail(currentBuild.currentResult)
-                }
-            // Will trigger only when job status changes: GREEN -> RED, RED -> GREEN, etc
+            success {
+                script {
+                    emailext (
+                       to: 'abhi.mech001@gmail.com',
+                       subject: "${env.JOB_NAME} #${env.BUILD_NUMBER} master is fine",
+                       body: "The build is happy.\n\nConsole: ${env.BUILD_URL}.\n\n",
+                       attachLog: true
+                    )
+                 }
+            }
         }
-      }   
     }
 }
