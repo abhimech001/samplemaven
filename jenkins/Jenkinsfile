@@ -1,5 +1,4 @@
 def gv
-def ns
 
 pipeline {
     agent any
@@ -19,7 +18,6 @@ pipeline {
             steps {
                 script{
                     gv = load "script.groovy"
-                    ns = load "buildNotification"
                 }
             }
         }
