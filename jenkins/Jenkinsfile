@@ -1,4 +1,5 @@
 def gv
+def ns
 
 pipeline {
     agent any
@@ -18,6 +19,7 @@ pipeline {
             steps {
                 script{
                     gv = load "script.groovy"
+                    ns = load "buildNotification"
                 }
             }
         }
@@ -57,5 +59,13 @@ pipeline {
                 sh './jenkins/scripts/deliver.sh'
             }
         }
+        post {
+        changed {
+            script {
+                    ns.notifyStatusChangeViaEmail(currentBuild.currentResult)
+                }
+            // Will trigger only when job status changes: GREEN -> RED, RED -> GREEN, etc
+        }
+      }   
     }
 }
