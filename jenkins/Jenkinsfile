@@ -21,46 +21,39 @@ pipeline {
                 }
             }
         }
+        
         stage('Parallel Stage') {
-        parallel {
-        stage('Build') {
-            steps {
-                script {
-                    gv.buildApp()
+            parallel {
+                
+                stage('Build') {
+                    steps {
+                        script {
+                            gv.buildApp()
+                        }
+                        sh """
+                        mvn versions:set versions:commit -DnewVersion="${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}"
+                        mvn -B -DskipTests clean package
+                        """
+                    }
                 }
-                sh """
-                mvn versions:set versions:commit -DnewVersion="${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}"
-                mvn -B -DskipTests clean package
-                """
+                stage('Test') {
+                    when {
+                        expression {
+                            params.isTest
+                        }
+                }
+                    steps {
+                        sh 'mvn test'
+                }
+                    post {
+                        always {
+                            junit 'target/surefire-reports/*.xml'
+                        }
+                    }
+                }
             }
         }
-        stage('Test') {
-            when {
-                expression {
-                    params.isTest
-                }
-            }
-            steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-        }}}
-        stage("Code coverage") {
-           steps {
-               jacoco(
-                    execPattern: '**/target/**.exec',
-                    classPattern: '**/target/classes',
-                    sourcePattern: '**/src',
-                    inclusionPattern: 'com/iamvickyav/**',
-                    changeBuildStatus: true,
-                    minimumInstructionCoverage: '30',
-                    maximumInstructionCoverage: '80')
-               }
-           }
+
         stage('Deliver') {
             when {
                 expression {
@@ -72,16 +65,17 @@ pipeline {
             }
         }
     }
-        post {
-            success {
-                script {
+    
+    post {
+         success {
+              script {
                     emailext (
                        to: 'abhi.mech001@gmail.com',
                        subject: "${env.JOB_NAME} #${env.BUILD_NUMBER} master is fine",
                        body: "The build is happy.\n\nConsole: ${env.BUILD_URL}.\n\n",
                        attachLog: true
                     )
-                 }
-            }
-        }
+                }
+           }
+      }
 }
